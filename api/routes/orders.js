@@ -1,57 +1,50 @@
 const express = require("express");
 const router = express.Router();
 
+const Order = require("../models/order");
+
 router.get("/", (req, res) => {
-    return res
-        .status(200)
-        .json();
+    Order
+        .find()
+        .exec()
+        .then(result => res.status(200).json(result))
+        .catch(err => res.status(500).json({ error: err }));
 });
 
 router.get("/:id", (req, res) => {
-    const id = req.id;
-    if (!id) {
-        return res
-            .status(404)
-            .json({ error: "Id is mandatory" });
-    }
+    Order
+        .findById(id)
+        .exec()
+        .then(result => res.status(200).json(result))
+        .catch(err => res.status(500).json({ error: err }));
 });
 
 router.post("/", (req, res) => {
-    const order = {
-        productId: req.body.productId,
-        time: req.body.time,
-        quantity: req.body.quantity
-    };
-
-    return res
-        .status(201)
-        .json({ message: "Order has been created" });
+    Order
+        .create({
+            productId: req.body.productId,
+            quantity: req.body.quantity,
+            time: req.body.time,
+        })
+        .then(result => {
+            console.log(result);
+            res.status(200).json({ message: "Order has been created", object: result });
+        })
+        .catch(err => res.status(500).json({ error: err }));
 });
 
 router.patch("/:id", (req, res) => {
-    const id = req.id;
-    if (!id) {
-        return res
-            .status(404)
-            .json({ error: "Id is mandatory" });
-    }
-
-    return res
-        .status(200)
-        .json({ message: "Order has been updated" });
+    const id = req.params.id;
+    Order.findByIdAndUpdate(id, { $set: req.body }, { new: true })
+        .then(result => res.status(200).json(result))
+        .catch(err => res.status(500).json({ error: err }))
 });
 
 router.delete("/:id", (req, res) => {
-    const id = req.id;
-    if (!id) {
-        return res
-            .status(404)
-            .json({ error: "Id is mandatory" });
-    }
-
-    return res
-        .status(200)
-        .json({ message: "Order has been deleted" });
+    Order
+        .deleteOne({ _id: id })
+        .then(result => res.status(200).json(result))
+        .catch(err => res.status(500).json({ error: err }));
 });
 
 module.exports = router;
