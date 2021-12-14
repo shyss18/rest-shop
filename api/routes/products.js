@@ -17,6 +17,11 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
+    const product = {
+        name: req.body.name,
+        price: req.body.price
+    };
+
     return res
         .status(201)
         .json({ message: "Product has been created" });
